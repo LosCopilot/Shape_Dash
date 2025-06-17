@@ -3,14 +3,18 @@ extends Area2D
 signal player_hit
 
 @export var normal_speed = 300
-@export var dash_speed = 800
-@export var dash_duration = 0.25  # Más tiempo de dash
-@export var dash_cooldown = 0.5
+@export var dash_speed = 1200  # Aumentado para mayor impacto
+@export var dash_duration = 0.35  # Duración aumentada
+@export var dash_cooldown = 0.4   # Cooldown reducido
+@export var acceleration = 15.0   # Para movimiento más fluido
+@export var deceleration = 20.0   # Para frenado más suave
 
-var current_speed = normal_speed
+var current_speed = 0
+var target_speed = 0
+var velocity = Vector2.ZERO
 var can_dash = true
 var is_dashing = false
-var last_movement_direction = Vector2.RIGHT  # Dirección por defecto
+var last_movement_direction = Vector2.RIGHT
 
 @onready var sprite = $Sprite
 var dash_timer: Timer
@@ -25,15 +29,25 @@ func _ready():
 func _physics_process(delta):
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
-	# Actualizamos la última dirección de movimiento si hay input
+	# Actualizar dirección y velocidad objetivo
 	if input_dir.length() > 0:
 		last_movement_direction = input_dir.normalized()
+		target_speed = normal_speed
+	else:
+		target_speed = 0
 	
-	# Movimiento continuo durante el dash
-	position += last_movement_direction * current_speed * delta
+	# Suavizar aceleración/desaceleración
+	if current_speed < target_speed:
+		current_speed = min(current_speed + acceleration * delta * 60, target_speed)
+	elif current_speed > target_speed:
+		current_speed = max(current_speed - deceleration * delta * 60, target_speed)
+	
+	# Aplicar movimiento
+	velocity = last_movement_direction * current_speed
+	position += velocity * delta
 	
 	# Dash con Space
-	if Input.is_action_just_pressed("dash") and can_dash:
+	if Input.is_action_just_pressed("dash") and can_dash and last_movement_direction != Vector2.ZERO:
 		start_dash()
 
 func setup_timers():
@@ -60,8 +74,12 @@ func start_dash():
 	
 	# Efecto visual mejorado
 	var tween = create_tween()
-	tween.tween_property(sprite, "scale", Vector2(1.3, 0.7), 0.05)
-	tween.parallel().tween_property(sprite, "modulate", Color(0.3, 0.3, 1.0), 0.05)
+	tween.tween_property(sprite, "scale", Vector2(1.4, 0.6), 0.1)
+	tween.parallel().tween_property(sprite, "modulate", Color(0.2, 0.2, 1.0, 0.8), 0.1)
+	
+	# Efecto de distorsión durante dash
+	var distortion_tween = create_tween()
+	distortion_tween.tween_property(sprite.material, "shader_param:distortion", 0.2, 0.1)
 	
 	dash_timer.start()
 	dash_cooldown_timer.start()
@@ -69,13 +87,18 @@ func start_dash():
 
 func end_dash():
 	is_dashing = false
-	current_speed = normal_speed
-	set_collision_mask_value(1, true)
+	target_speed = normal_speed if Input.get_vector("move_left", "move_right", "move_up", "move_down").length() > 0 else 0
 	
-	# Restaurar efectos visuales
+	# Restaurar efectos visuales suavemente
 	var tween = create_tween()
-	tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
-	tween.parallel().tween_property(sprite, "modulate", Color.WHITE, 0.1)
+	tween.tween_property(sprite, "scale", Vector2.ONE, 0.15)
+	tween.parallel().tween_property(sprite, "modulate", Color.WHITE, 0.15)
+	
+	# Restaurar distorsión
+	var distortion_tween = create_tween()
+	distortion_tween.tween_property(sprite.material, "shader_param:distortion", 0.0, 0.15)
+	
+	set_collision_mask_value(1, true)
 
 func _on_dash_timer_timeout():
 	end_dash()
@@ -89,8 +112,11 @@ func _on_area_entered(area):
 
 func _on_game_started():
 	# Resetear estado al iniciar juego
-	current_speed = normal_speed
+	current_speed = 0
+	target_speed = 0
+	velocity = Vector2.ZERO
 	can_dash = true
 	is_dashing = false
+	last_movement_direction = Vector2.RIGHT
 	sprite.modulate = Color.WHITE
 	sprite.scale = Vector2.ONE
