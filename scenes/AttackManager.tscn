@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbe5mxh57ycq1"]
+
+[ext_resource type="Script" uid="uid://cbn7v1c53rm33" path="res://scripts/attack_patterns/Attack_manager.tscn.gd" id="1_asm8y"]
+
+[node name="AttackManager_tscn" type="Node2D"]
+script = ExtResource("1_asm8y")
+
+[node name="SpawnTimer" type="Timer" parent="."]

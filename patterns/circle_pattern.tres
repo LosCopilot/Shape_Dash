@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AttackPattern" load_steps=4 format=3 uid="uid://csxwvln1kjyi2"]
+
+[ext_resource type="PackedScene" uid="uid://ojjsx7oq8xxj" path="res://scenes/obstacles/Circle Attack.tscn" id="1_ckf6a"]
+[ext_resource type="Script" uid="uid://1yudeyg2bnpn" path="res://scripts/attack_patterns/AttackPattern.gd" id="1_p64lf"]
+[ext_resource type="Curve" uid="uid://w7lgdacfcese" path="res://patterns/circle_curve.tres" id="1_pf4n1"]
+
+[resource]
+script = ExtResource("1_p64lf")
+name = "Circle Attack"
+obstacle_scene = ExtResource("1_ckf6a")
+speed = 200.0
+duration = 3.0
+spawn_interval = 0.2
+movement_curve = ExtResource("1_pf4n1")
+metadata/_custom_type_script = "uid://1yudeyg2bnpn"
