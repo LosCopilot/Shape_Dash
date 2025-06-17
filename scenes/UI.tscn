@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bunrt5c12rgbf"]
+
+[ext_resource type="Script" uid="uid://dyg2hcjobqjr2" path="res://scripts/UI.gd" id="1_dj8aq"]
+
+[node name="Ui" type="CanvasLayer"]
+script = ExtResource("1_dj8aq")
+
+[node name="ScoreLabel" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Score: 0"

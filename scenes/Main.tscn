@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://cjmda83wr3oth"]
+
+[ext_resource type="Script" uid="uid://6cwwvpyxom21" path="res://scripts/Main.gd" id="1_elqb8"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_elqb8")
+
+[node name="ObstacleTimer" type="Timer" parent="."]
+
+[node name="GameOverTimer" type="Timer" parent="."]
+wait_time = 3.0
+
+[connection signal="timeout" from="ObstacleTimer" to="." method="_on_obstacle_timer_timeout"]
